@@ -1,7 +1,7 @@
 module.exports =  {
-	entry: "./src/index.js",
+	entry: "./src/sdk.js",
 	output: {
-		path: "./docs",
+		path: "./dist",
 		filename: "sdk.js",
 		library : 'sfSDK'
 	},

@@ -1,12 +1,9 @@
 /**
- * message 跨文档消息交互API实现文件
- * PostMessage 通信
+ * 七鱼SDK
  *
  * @author:   波比(｡･∀･)ﾉﾞ
- * @date:     2016-10-18  下午1:52
+ * @date:     2016-10-25  下午8:11
  */
-
-
 
 module.exports = function(){
 
