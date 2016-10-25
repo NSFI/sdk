@@ -1,0 +1,37 @@
+{
+  "name": "sf-sdk",
+  "version": "0.0.1",
+  "description": "SDK for Sailfish",
+  "scripts": {
+    "online" : "webpack -p --config webpack.config.online.js",
+    "build": "webpack -w --config webpack.config.js",
+    "test": "karma start karma.conf.js",
+    "dev": "webpack-dev-server --inline --hot -quiet"
+  },
+  "repository": {
+    "type": "git",
+     "url": "git+https://github.com/NSFI/sf-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NSFI/sf-sdk/issues"
+  },
+  "homepage": "https://github.com/NSFI/sf-sdk#readme",
+  "keywords": [
+    "sf-sdk",
+    "NSFI"
+  ],
+  "devDependencies": {
+    "jasmine-core": "^2.4.1",
+    "karma": "^0.12.36",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.0.2",
+    "karma-webpack": "^1.7.0",
+    "karma-coverage" : "^1.1.1",
+    "phantomjs": "^2.1.7",
+    "webpack": "^1.13.1",
+    "lodash": "^4.16.4",
+    "koa" : "^1.2.4"
+  },
+  "author": "波比(｡･∀･)ﾉﾞ",
+  "license": "MIT"
+}

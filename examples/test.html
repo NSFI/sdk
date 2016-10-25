@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Test</title>
+	<link rel="stylesheet" type="text/css" href="../docs/reset.css">
+	<style>
+		#app {
+			margin: 30px auto;
+			padding: 30px 50px;
+			width: 700px;
+			background-color: #fff;
+			box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+		}
+
+		h1 {
+			margin-bottom: 30px;
+			text-align: center;
+			font-size: 36px;
+		}
+		.m-dnd-tom{
+			padding: 20px;
+			border:1px dotted #d1d1d1
+		}
+		.m-dnd-tom .tom_item{
+			height:33px;
+			line-height:33px;
+			padding : 5px;
+			box-sizing: border-box;
+		}
+		.m-dnd-tom .tom_item:nth-child(n+2){
+			border-top : 2px dashed #ffffff;
+		}
+		.m-dnd-tom .tom_item:nth-child(even){
+			background-color : rgba(255, 193, 7, 0.5)
+		}
+		.m-dnd-tom .tom_item:nth-child(odd){
+			background-color : rgba(33, 150, 243, 0.5)
+		}
+
+		.m-dnd-lucy{
+			 padding: 20px;
+			 border:1px dotted #d1d1d1
+		 }
+		.m-dnd-lucy .tom_item{
+			height:33px;
+			line-height:33px;
+			padding : 5px;
+			box-sizing: border-box;
+		}
+		.m-dnd-lucy .tom_item:nth-child(n+2){
+			border-top : 2px dashed #ffffff;
+		}
+		.m-dnd-lucy .tom_item:nth-child(even){
+			background-color : rgba(255, 193, 7, 0.5)
+		}
+		.m-dnd-lucy .tom_item:nth-child(odd){
+			background-color : rgba(33, 150, 243, 0.5)
+		}
+		.m-dnd-juck{
+			padding: 20px;
+			border:1px dotted #d1d1d1
+		}
+		.m-dnd-juck .tom_item{
+			height:33px;
+			line-height:33px;
+			padding : 5px;
+			box-sizing: border-box;
+		}
+		.m-dnd-juck .tom_item:nth-child(n+2){
+			border-top : 2px dashed #ffffff;
+		}
+		.m-dnd-juck .tom_item:nth-child(even){
+			background-color : rgba(255, 193, 7, 0.5)
+		}
+		.m-dnd-juck .tom_item:nth-child(odd){
+			background-color : rgba(33, 150, 243, 0.5)
+		}
+		.code{
+			margin-top:20px;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+<article id="app">
+	<h1>lucy -- tom</h1>
+	<sf-dnd :source="source" name="lucy" from="tom" >
+		<li v-for="(x, index) in source" :key="x" class="tom_item" >
+			{{x}}
+		</li>
+	</sf-dnd>
+	<h1>juck -- lucy</h1>
+	<sf-dnd :source="source2" name="juck" from="lucy" >
+		<li v-for="(x, index) in source2" :key="x" class="tom_item"  >
+			{{x}}
+		</li>
+	</sf-dnd>
+	<h1>tom -- lucy</h1>
+	<sf-dnd :source="source1" name="tom" from="lucy">
+		<li v-for="(x, index) in source1" :key="x" class="tom_item">
+			{{x}}
+		</li>
+	</sf-dnd>
+
+	<h1 class="code">{{source1}}</h1>
+</article>
+
+<div id="frame">
+
+</div>
+<script src="../docs/vue.js"></script>
+<script src="../docs/index.js"></script>
+<script>
+	window.sfDND = {
+		tom : ['1','2','3','4','5'],
+		juck : ['z', 'y'],
+		lucy : ['a', 'b']
+	};
+
+	new Vue({
+		el : '#app',
+		data : function(){
+			return {
+				source1 : window.sfDND.tom,
+				source : window.sfDND.lucy,
+				source2 : window.sfDND.juck
+			}
+		},
+		components : {
+			'sfDnd' : sfDnd.dnd
+		},
+		methods:{
+			change : function(list){
+				console.log(list)
+			}
+		}
+	})
+</script>
+</body>
+</html>
