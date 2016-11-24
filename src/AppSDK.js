@@ -6,54 +6,12 @@
  */
 
 var SDK = require('./sdk');
-var Cache = require('./cache');
 
-
-
-class TraderSDK extends SDK {
+class AppSDK extends SDK {
 	constructor(options){
 		super(options)
-	}
-
-	init(options){
-
-	}
-
-	/**
-	 * 未读数逻辑
-	 */
-	unread(){
-	}
-
-	/**
-	 * 注销账户
-	 */
-	logoff(){
-
-	}
-
-	/**
-	 * 打开入口
-	 */
-	open(){
-
-	}
-
-	/**
-	 *
-	 * @param options
-	 */
-	config(options){
-
-	}
-
-	/**
-	 * 同步CRM信息
-	 */
-	syncProfile(){
-
 	}
 }
 
 
-module.exports = TraderSDK;
+module.exports = AppSDK;

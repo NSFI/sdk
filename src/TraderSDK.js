@@ -100,15 +100,23 @@ class TraderSDK extends SDK {
 		for(var key in param){
 			ret.push(key + '=' + param[key]);
 		}
-
 		window.open(url, 'YSF_SERVICE_' + (cache.k || '').toUpperCase(), ret.join(','));
 	}
 
+
 	/**
-	 *
+	 * 配置入口
 	 * @param options
 	 */
 	config(options){
+
+	}
+
+
+	/**
+	 * 同步CRM信息
+	 */
+	syncProfile(){
 
 	}
 }
@@ -119,14 +127,14 @@ module.exports = function(options){
 	util.each({
 		DOMAIN : options.domain,
 		IMROOT : (function(){
-			return options.domain + 'traderClient/'
+			return options.domain + '/traderClient/'
 		})(),
 		RESROOT : options.domain + '/sdk/'
 	}, function(k, v){
 		if(ysfTrader[k] == null){
 			ysfTrader[k] = v
 		}
-	})
+	});
 
 
 	return new TraderSDK(options);
