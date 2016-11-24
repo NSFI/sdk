@@ -5,7 +5,6 @@
  * @date:     2016-10-25  下午8:29
  */
 
-
 var addEvent = function(target, eventType, callback) {
 	if (target.addEventListener) {
 		target.addEventListener(eventType, callback, false);
@@ -19,4 +18,9 @@ var isMobilePlatform = function(){
 		return true;
 	}
 	return false;
+}
+
+module.exports = {
+	addEvent : addEvent,
+	isMobilePlatform : isMobilePlatform
 }

@@ -1,7 +1,7 @@
 module.exports =  {
     entry: {
-		sdk : './src/sdk.js',
-		delegate : './src/util.js'
+		sdk : './src/AppSDK.js',
+		delegate : './src/TraderSDK.js'
 	},
     output: {
         path: "./dist",
