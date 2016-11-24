@@ -1,18 +1,24 @@
 module.exports =  {
-    entry: "./src/sdk.js",
+    entry: {
+		sdk : './src/sdk.js',
+		delegate : './src/util.js'
+	},
     output: {
         path: "./dist",
-        filename: "index.js",
-		library : 'sfSDK'
-    },
-	//devtool: "source-map",
-    resolve:{
-        extensions: ['', '.js', '.vue']
+        filename: "[name].js",
+		library : 'SFSDK'
     },
     module: {
         loaders: [
-            {test: /\.html/, exclude : /node_modules/, loader: 'html'},
-			{test: /\.scss$/, exclude : /node_modules/, loader: "style!css!sass" }
+			{
+				test: /\.js/,
+				exclude: /node_modules/,
+				loader: 'babel',
+				query: {
+					presets: ['es2015-loose', 'stage-0'],
+					plugins: ['transform-runtime']
+				}
+			}
         ]
     }
 };
