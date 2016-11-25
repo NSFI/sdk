@@ -8,6 +8,7 @@
 const SDK = require('./sdk');
 const Cache = require('./cache');
 const util = require('./util/util');
+const dom = require('./util/dom');
 const _ = require('lodash');
 
 var ysfTrader = {};
@@ -114,12 +115,75 @@ class TraderSDK extends SDK {
 
 	}
 
+	/**
+	 * 往访客端同步消息
+	 */
+	sendMsg(){
+		if(this.proxy){
+			console.error('[error] : proxy not exist')
+			return;
+		}
 
+		try{
+			this.proxy.contentWindow.postMessage(msg, '*');
+		}catch(err){
+			console.log(err);
+		}
+	}
+
+	/**
+	 * 接受七鱼访客端同步消息
+	 * @param event
+	 */
+	receiveMsg(event){
+		var that = this;
+		var cmap = {
+			rdy : ()=>{
+				that.syncProfile();
+			}
+		}
+
+
+		// check origin
+		if (event.origin != ysfTrader.ROOT) {
+			return;
+		}
+
+		// do command
+		var arr = (event.data || '').split(':'),
+			type = arr.shift();
+
+		if( type == 'pkg'){
+			this.receiveMsgPkg(JSON.parse(arr.join(':')));
+			return;
+		};
+
+		var func = cmap[(type || '').toLowerCase()];
+
+		if (!!func) {
+			func(arr.join(':'));
+		}
+	}
+
+	/**
+	 * 指令消息
+	 * @param event
+	 */
+	
+	receiveMsgPkg(event){
+		
+	}
 	/**
 	 * 同步CRM信息
 	 */
 	syncProfile(){
 
+	}
+
+	buildProxy(src){
+		var src = src || ysfTrader.RESROOT + 'res/delegate.html';
+		if(this.proxy) return;
+		this.proxy = dom.buildIframe(src)
 	}
 }
 
