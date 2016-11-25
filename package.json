@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "SDK for Sailfish",
   "scripts": {
-    "build": "webpack -w --config webpack.config.js",
+    "build": "webpack -w -p --config webpack.config.js",
     "test": "karma start karma.conf.js",
     "dev": "webpack-dev-server --inline --hot -quiet"
   },

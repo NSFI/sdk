@@ -32,10 +32,11 @@ var config = {
 
 class TraderSDK extends SDK {
 	constructor(options){
+		super(options);
 		options = _.merge(config, options);
 
 		this.options = options;
-		super(options);
+
 		this.init(options);
 	}
 	init(options){

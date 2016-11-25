@@ -9,6 +9,7 @@ const EventEmitter = require('events').EventEmitter;
 
 class SDK extends EventEmitter {
 	constructor(options){
+		super(options);
 		this.init(options);
 	}
 	init(options){
