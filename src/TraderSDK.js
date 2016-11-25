@@ -40,6 +40,7 @@ class TraderSDK extends SDK {
 		this.init(options);
 	}
 	init(options){
+		console.log("sdfas")
 		this.cache = new Cache(options);
 	}
 

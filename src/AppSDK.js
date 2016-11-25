@@ -9,7 +9,9 @@ var SDK = require('./sdk');
 
 class AppSDK extends SDK {
 	constructor(options){
-		super(options)
+		super(options);
+		console.log('dddd');
+
 	}
 }
 

@@ -1,3 +1,11 @@
+'use strict';
+
+var  babelQuery ={
+	presets: ['es2015'],
+	plugins: ['transform-es3-property-literals','transform-es3-member-expression-literals']
+}
+
+
 module.exports =  {
     entry: {
 		AppSdk : './src/AppSDK.js',
@@ -11,13 +19,9 @@ module.exports =  {
     module: {
         loaders: [
 			{
-				test: /\.js/,
+				test: /\.js$/,
 				exclude: /node_modules/,
-				loader: 'babel',
-				query: {
-					presets: ['es2015-loose', 'stage-0'],
-					plugins: ['transform-runtime', 'transform-es3-property-literals','transform-es3-member-expression-literals']
-				}
+				loaders: ['es3ify-loader',`babel?${JSON.stringify(babelQuery)}`]
 			}
         ]
     }

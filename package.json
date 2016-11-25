@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "SDK for Sailfish",
   "scripts": {
-    "build": "webpack -w -p --config webpack.config.js",
+    "build": "webpack -w  --config webpack.config.js",
     "test": "karma start karma.conf.js",
     "dev": "webpack-dev-server --inline --hot -quiet"
   },
@@ -29,6 +29,7 @@
     "babel-preset-es2015-loose": "^8.0.0",
     "babel-preset-stage-0": "^6.16.0",
     "babel-runtime": "^6.18.0",
+    "es3ify-loader": "^0.2.0",
     "jasmine-core": "^2.4.1",
     "karma": "^0.12.36",
     "karma-chrome-launcher": "^2.0.0",
