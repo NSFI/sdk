@@ -85,7 +85,7 @@ class Cache extends EventEmitter {
 
 
 	setItemsInUser(hash){
-		if(u.typeof(hash) == 'object'){
+		if(_.isObject(hash)){
 			_.merge(user, hash);
 		}else{
 			console.error('mergeDataInUser must be object', hash, user)
