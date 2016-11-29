@@ -12,13 +12,13 @@ const u = require('./util/util');
 
 
 var cache = {
-	t : '',  // document.title
+	t : '',  	// document.title
 	k : -1,		 // appkey
 	u : -1,	 	 // 用户id
 	b : -1,	 	 // 商家id
 	gid : 0,	 // 分组id
 	sid : 0,	 // 客服id
-	qtype : 0	 //
+	qtype : 0	 // 问题分类
 };
 
 
