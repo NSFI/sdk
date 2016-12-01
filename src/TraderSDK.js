@@ -43,6 +43,22 @@ class TraderSDK extends SDK {
 	init(options){
 		console.log("sdfas")
 		this.cache = new Cache(options);
+		this.initUrl(options);
+		this.buildProxy();
+	}
+
+	initUrl(options){
+		util.each({
+			DOMAIN : options.domain,
+			IMROOT : (function(){
+				return options.domain + '/traderClient/'
+			})(),
+			RESROOT : options.domain + '/sdk/'
+		}, function(k, v){
+			if(ysfTrader[k] == null){
+				ysfTrader[k] = v;
+			}
+		});
 	}
 
 	url() {
@@ -126,7 +142,7 @@ class TraderSDK extends SDK {
 	 * 往访客端同步消息
 	 */
 	sendMsg(){
-		if(this.proxy){
+		if(!this.proxy){
 			console.error('[error] : proxy not exist')
 			return;
 		}

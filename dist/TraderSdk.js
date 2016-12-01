@@ -127,6 +127,23 @@ var SFSDK =
 			value: function init(options) {
 				console.log("sdfas");
 				this.cache = new Cache(options);
+				this.initUrl(options);
+				this.buildProxy();
+			}
+		}, {
+			key: 'initUrl',
+			value: function initUrl(options) {
+				util.each({
+					DOMAIN: options.domain,
+					IMROOT: function () {
+						return options.domain + '/traderClient/';
+					}(),
+					RESROOT: options.domain + '/sdk/'
+				}, function (k, v) {
+					if (ysfTrader[k] == null) {
+						ysfTrader[k] = v;
+					}
+				});
 			}
 		}, {
 			key: 'url',
@@ -228,7 +245,7 @@ var SFSDK =
 		}, {
 			key: 'sendMsg',
 			value: function sendMsg() {
-				if (this.proxy) {
+				if (!this.proxy) {
 					console.error('[error] : proxy not exist');
 					return;
 				}
