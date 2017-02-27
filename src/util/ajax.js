@@ -34,7 +34,7 @@ module.exports = function(options){
 		data = options.data || null,
 		success = options.success,
 		error = options.error,
-		headers = options.headers || {}
+		headers = options.headers || {};
 
 	var req = buildRequest();
 

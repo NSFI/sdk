@@ -13,14 +13,14 @@ var addEvent = function (target, eventType, callback) {
 	} else if (target.attachEvent) {
 		target.attachEvent('on' + eventType, callback);
 	}
-}
+};
 
 var isMobilePlatform = function () {
 	if (/(iPhone|iPod|iOS|Android)/i.test(navigator.userAgent)) {
 		return true;
 	}
 	return false;
-}
+};
 
 
 var buildIframe = function (src) {

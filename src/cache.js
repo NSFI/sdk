@@ -49,6 +49,8 @@ class Cache extends EventEmitter {
 	constructor(options){
 		super(options);
 		this.appKey = options.appKey;
+		this.cache = cache;
+		this.user = user;
 	}
 
 	getUser(){
