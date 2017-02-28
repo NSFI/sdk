@@ -59,7 +59,7 @@ module.exports = function(options){
 					error({
 						code : errorCode,
 						message : req.responseText
-					})
+					});
 				}
 			}
 		};
@@ -67,4 +67,4 @@ module.exports = function(options){
 		console.error(err);
 	}
 
-}
+};
