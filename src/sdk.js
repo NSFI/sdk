@@ -14,6 +14,53 @@ class SDK extends EventEmitter {
 	}
 	init(options){
 	}
+
+	/**************接口层*************/
+
+	/**
+	 * 未读消息
+	 */
+	unread (){
+
+	}
+	/**
+	 * 配置方式
+	 */
+	config (){
+
+	}
+
+	/**
+	 * 商品链接
+	 *
+	 */
+	product(){
+
+	}
+
+	/**
+	 * 事件监听
+	 *
+	 */
+	on(){
+
+	}
+
+	/**
+	 * 登出
+	 *
+	 */
+	logoff(){
+
+	}
+
+	/**
+	 * 打开访客端窗口
+	 */
+	open(){
+
+	}
+
 }
 
 module.exports = SDK;

@@ -43,6 +43,22 @@ class TraderSDK extends SDK {
 	init(options){
 		console.log("sdfas")
 		this.cache = new Cache(options);
+		this.initUrl(options);
+		this.buildProxy();
+	}
+
+	initUrl(options){
+		util.each({
+			DOMAIN : options.domain,
+			IMROOT : (function(){
+				return options.domain + '/traderClient/'
+			})(),
+			RESROOT : options.domain + '/sdk/'
+		}, function(k, v){
+			if(ysfTrader[k] == null){
+				ysfTrader[k] = v;
+			}
+		});
 	}
 
 	url() {
@@ -56,6 +72,7 @@ class TraderSDK extends SDK {
 			gid : cache.gid,
 			uid : cache.uid,
 			qtype : cache.qtype,
+			bid : cache.b,
 			t : encodeURIComponent(document.title)
 		});
 
@@ -94,7 +111,7 @@ class TraderSDK extends SDK {
 
 	openUrl(url){
 		var cache = this.cache.getItemsInCache();
-		window.open(url, 'YSF_SERVICE_' + (cache.k || '').toUpperCase(), '');
+		window.open(url, 'YSF_SERVICE_' + (cache.appkey || '').toUpperCase(), '');
 	}
 	openWin(url, event){
 		var param = event.param,
@@ -112,14 +129,20 @@ class TraderSDK extends SDK {
 	 * @param options
 	 */
 	config(options){
+		if (!options) return;
 
+		this.cache.setItemsInUser(options);
+
+		if (!! this.cache.appKey) {
+			this.syncProfile();
+		}
 	}
 
 	/**
 	 * 往访客端同步消息
 	 */
 	sendMsg(){
-		if(this.proxy){
+		if(!this.proxy){
 			console.error('[error] : proxy not exist')
 			return;
 		}
@@ -177,7 +200,27 @@ class TraderSDK extends SDK {
 	 * 同步CRM信息
 	 */
 	syncProfile(){
+		var user = {
+			title: document.title || ''
+		};
+		var cacheUser = this.cache.getItemsInUser();
 
+		util.each({
+			name: '',
+			email: '',
+			mobile: '',
+			avatar: '',
+			profile: 'data'
+		}, function(k, v){
+			var it = cacheUser[v] || cacheUser[k];
+			if (it != null) {
+				user[k] = it;
+			}
+		});
+
+		user.referrer = location.href;
+		user.uid = cacheUser.uid || '';
+		this.sendMsg('USR:' + util.serialize(user));
 	}
 
 	buildProxy(src){
@@ -185,8 +228,33 @@ class TraderSDK extends SDK {
 		if(this.proxy) return;
 		this.proxy = dom.buildIframe(src)
 	}
+
+	entry(options){
+		var cache = this.cache.getItemsInCache();
+		var parent = dom.buildHolder(cache,options);
+		dom.buildCircle(parent);
+		dom.buildBubble(parent);
+	}
 }
 
+window.__YSFOPTION__ = {
+    corpInfo: Number('0'),
+    winType: Number('3'),
+    sdkCustom: 0,
+    hidden: 0,
+    appKey: '85d4ae43dfc35259c4a29abc9aea8f55',
+    domain: "https://ysf.space"
+};
+__YSFOPTION__.uid = localStorage.getItem('YSF-' + __YSFOPTION__['appKey'].toUpperCase() + '-UID') || '';
+try {
+    __YSFOPTION__.profile = JSON.stringify(__YSFOPTION__.profile);
+} catch(ex) {
+    __YSFOPTION__.profile = '';
+}
+__YSFOPTION__.imgSrc = 'https://ysf.space/sdk/res/kefu/custom/3.png';
+window.__YSFSDKADR__ = "https://ysf.space";
+
+window.ysfTrader = new TraderSDK(__YSFOPTION__);
 
 module.exports = function(options){
 
@@ -201,7 +269,6 @@ module.exports = function(options){
 			ysfTrader[k] = v
 		}
 	});
-
 
 	return new TraderSDK(options);
 };
