@@ -113,3 +113,139 @@ var sendMsg = function(msg) {
         // ignore
     }
 };
+
+/**
+ * 添加消息提醒锁, 300毫秒内认为是无效的
+ *
+ */
+var msgNotifyLock = (function() {
+    var timer = null;
+    return function(data, callback) {
+        var key = ('YSFMSG-' + cache['appKey'] + '-' + data.id).toUpperCase();
+        if (timer) {
+            clearTimeout(timer);
+        }
+
+        setTimeout(function() {
+            if (window.localStorage.getItem(key) == null) {
+                window.localStorage.setItem(key, 1);
+                callback(true);
+            };
+
+            callback(false);
+        }, cache['dvcTimer'] * 100);
+    }
+})();
+
+/**
+ * 接受消息
+ * @param event
+ */
+var receiveMsg = function(event) {
+    // check origin
+    if (event.origin != ysf.ROOT) {
+        return;
+    }
+    // do command
+    var arr = (event.data || '').split(':'),
+        type = arr.shift();
+
+    if (type == 'pkg') {
+        receivePkg(JSON.parse(arr.join(':')));
+        return;
+    };
+
+
+    var func = cmap[(type || '').toLowerCase()];
+    if (!!func) {
+        func(arr.join(':'));
+    }
+};
+
+/**
+ * 执行方式接受消息
+ * 
+ * @param {Object} data 			- 接受消息
+ * @param {String} data.type		- 消息类型
+ */
+var receivePkg = function(data) {
+    var fmap = {
+        notify: function(data) {
+            var dvc = 'YSF-' + device() + '-MSGNUMBERS';
+
+
+            msgNotifyLock(data, function(flag) {
+                var num = Number(window.localStorage.getItem(dvc) || 0),
+                    circleNum = flag ? (++num) : num;
+
+                // 缓存 未读消息 及 未读数量
+                cache['notifyContent'] = data;
+                cache['notifyNumber'] = circleNum;
+
+                if (flag) ysf._unread(ysf.getUnreadMsg());
+
+                ysf.NotifyMsgAndBubble({
+                    category: 'notifyCircle',
+                    data: {
+                        circleNum: circleNum,
+                        notifyCnt: data.content,
+                        type: data.type
+                    }
+                })
+            });
+
+        },
+        winfocus: function(msg) {
+            util.notification(msg);
+        },
+        closeIframe: function(event) {
+            var layerNode = document.getElementById('YSF-PANEL-CORPINFO') || document.getElementById('YSF-PANEL-INFO'),
+                btnNode = document.getElementById('YSF-BTN-HOLDER');
+            layerNode.className = 'ysf-chat-layer';
+            layerNode.setAttribute('data-switch', 0);
+            try {
+                sendChatMsg('status', { 'layerOpen': 0 });
+            } catch (ex) {}
+
+            if (cache['hidden'] == 0) btnNode.style.display = 'block';
+
+        },
+        leaveOk: function(event) {
+            if (util.resetTimer) clearTimeout(util.resetTimer);
+            util.resetTimer = setTimeout(function() {
+                reset();
+            }, 1000);
+        },
+        pushMsg: function(event) {
+            if (event.data.sdkAppend) {
+                CircleNumberFlag = CircleNumberFlag + 1;
+                msgSessionIds.push(event.data.msgSessionId);
+                ysf.NotifyMsgAndBubble({
+                    category: 'notifyCircle',
+                    data: {
+                        circleNum: CircleNumberFlag,
+                        notifyCnt: event.data.content,
+                        type: 'text' // 消息类型 text
+                    }
+                })
+            }
+        }
+    };
+
+    var func = fmap[data.category];
+    if (!!func) {
+        func(data)
+    }
+
+};
+
+module.exports = {
+	sendChatMsg: sendChatMsg,
+	visit: visit,
+	syncProfile: syncProfile,
+	syncCustomProfile: syncCustomProfile,
+	sendMsg: sendMsg,
+	msgNotifyLock: msgNotifyLock,
+	receiveMsg: receiveMsg,
+	receivePkg: receivePkg
+}

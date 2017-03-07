@@ -13,21 +13,21 @@ var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'; // 
  * @param options
  * @returns {string}
  */
-var mergeUrl = function(url, options){
-	var arr = url.split('?'),
-		furl= arr.shift(),
-		origin = query2Object(arr.shift() || '', '&');
-	// merge data
-	for(var key in options){
-		origin[key] = options[key]
-	}
+var mergeUrl = function(url, options) {
+    var arr = url.split('?'),
+        furl = arr.shift(),
+        origin = query2Object(arr.shift() || '', '&');
+    // merge data
+    for (var key in options) {
+        origin[key] = options[key]
+    }
 
-	// sarialize
-	for(var key in origin){
-		arr.push(key + '=' + (origin[key] || ''))
-	}
+    // sarialize
+    for (var key in origin) {
+        arr.push(key + '=' + (origin[key] || ''))
+    }
 
-	return furl + '?' + arr.join('&');
+    return furl + '?' + arr.join('&');
 }
 
 /**
@@ -36,18 +36,18 @@ var mergeUrl = function(url, options){
  * @param reg
  * @returns {{}}
  */
-var query2Object = function(str, reg){
-	var r = str.split(reg),
-		c = {};
-	for(var i=0;i<r.length;i++){
-		var itm = r[i],
-			tmp = (itm || '').split('='),
-			key = tmp.shift();
-		if(!key) continue;
-		c[decodeURIComponent(key)] = decodeURIComponent(tmp.join('='));
-	}
+var query2Object = function(str, reg) {
+    var r = str.split(reg),
+        c = {};
+    for (var i = 0; i < r.length; i++) {
+        var itm = r[i],
+            tmp = (itm || '').split('='),
+            key = tmp.shift();
+        if (!key) continue;
+        c[decodeURIComponent(key)] = decodeURIComponent(tmp.join('='));
+    }
 
-	return c;
+    return c;
 }
 
 /**
@@ -55,8 +55,8 @@ var query2Object = function(str, reg){
  * @param obj
  * @private
  */
-var _typeof =  function(obj) {
-	({}).toString.call(obj).toLowerCase().slice(8,-1)
+var _typeof = function(obj) {
+    ({}).toString.call(obj).toLowerCase().slice(8, -1)
 };
 
 /**
@@ -65,25 +65,26 @@ var _typeof =  function(obj) {
  * @param noJson
  * @returns {Array}
  */
-var findLocalItems = function(query, noJson){
-	var i, results = [], value;
-	for (i in localStorage) {
-		if (i.match(query) || (!query && typeof i === 'string')) {
-			value = !noJson ? localStorage.getItem(i) : JSON.parse(localStorage.getItem(i));
-			results.push({key:i,val:value});
-		}
-	}
-	return results;
+var findLocalItems = function(query, noJson) {
+    var i, results = [],
+        value;
+    for (i in localStorage) {
+        if (i.match(query) || (!query && typeof i === 'string')) {
+            value = !noJson ? localStorage.getItem(i) : JSON.parse(localStorage.getItem(i));
+            results.push({ key: i, val: value });
+        }
+    }
+    return results;
 };
 
 /**
  * clearLocalItems
  * @param list
  */
-var clearLocalItems =  function(list){
-	for(var i=0;i<list.length;i++){
-		window.localStorage.removeItem(list[i].key);
-	}
+var clearLocalItems = function(list) {
+    for (var i = 0; i < list.length; i++) {
+        window.localStorage.removeItem(list[i].key);
+    }
 };
 
 /**
@@ -91,13 +92,13 @@ var clearLocalItems =  function(list){
  *
  * @returns {string}
  */
-var random = function(){
-	var ret = [];
-	for (var i = 0, n; i < 20; ++i) {
-		n = Math.floor(Math.random() * chars.length);
-		ret.push(chars.charAt(n));
-	}
-	return ret.join('').toLowerCase();
+var random = function() {
+    var ret = [];
+    for (var i = 0, n; i < 20; ++i) {
+        n = Math.floor(Math.random() * chars.length);
+        ret.push(chars.charAt(n));
+    }
+    return ret.join('').toLowerCase();
 }
 
 /**
@@ -105,13 +106,13 @@ var random = function(){
  * @param o
  * @param func
  */
-var each = function (o, func) {
-	if (!o || !func) return;
-	for (var x in o) {
-		if (o.hasOwnProperty(x)) {
-			func.call(null, x, o[x]);
-		}
-	}
+var each = function(o, func) {
+    if (!o || !func) return;
+    for (var x in o) {
+        if (o.hasOwnProperty(x)) {
+            func.call(null, x, o[x]);
+        }
+    }
 };
 
 /**
@@ -120,8 +121,8 @@ var each = function (o, func) {
  * @return {void}
  * @description 合并数据
  */
-var merge = function (o) {
-    each(o, function (k, v) {
+var merge = function(o) {
+    each(o, function(k, v) {
         cache[k] = v;
     });
 };
@@ -132,15 +133,15 @@ var merge = function (o) {
  * @return {string}
  * @description 序列化对象
  */
-var serialize = function (o) {
-	var ret = [];
-	each(o, function (k, v) {
-		ret.push(
-			encodeURIComponent(k) + '=' +
-			encodeURIComponent(v)
-		);
-	});
-	return ret.join('&');
+var serialize = function(o) {
+    var ret = [];
+    each(o, function(k, v) {
+        ret.push(
+            encodeURIComponent(k) + '=' +
+            encodeURIComponent(v)
+        );
+    });
+    return ret.join('&');
 };
 
 /**
@@ -149,37 +150,37 @@ var serialize = function (o) {
  * @returns {void}
  */
 
-var notification = function(){
+var notification = function() {
     var notify, timer;
-    return function(msg){
-        if(notify){
+    return function(msg) {
+        if (notify) {
             clearTimeout(timer);
             notify.close();
         }
-        if(window.Notification && window.Notification.permission !== "granted"){
+        if (window.Notification && window.Notification.permission !== "granted") {
             Notification.requestPermission();
         }
 
         if (window.Notification && window.Notification.permission != "denied") {
             notify = new Notification(msg.notify, {
                 tag: msg.tag,
-                body : msg.body,
-                icon : window.__YSFSDKADR__ + msg.icon
+                body: msg.body,
+                icon: window.__YSFSDKADR__ + msg.icon
             });
             util.playAudio();
-            notify.onclick = function(){
-                notify&&notify.close();
+            notify.onclick = function() {
+                notify && notify.close();
                 window.focus();
                 ysf.openLayer();
-                ysf.NotifyMsgAndBubble({category : 'clearCircle'});
+                ysf.NotifyMsgAndBubble({ category: 'clearCircle' });
 
             };
 
             // close notify
             timer = window.setTimeout(
-                function(){
+                function() {
                     notify.close();
-                },20000
+                }, 20000
             );
         }
     }
@@ -190,11 +191,11 @@ var notification = function(){
  *
  * @returns {void}
  */
-var playAudio = function(){
+var playAudio = function() {
     var audio = document.createElement('audio');
     audio.src = window.__YSFSDKADR__ + "/prd/res/audio/message.mp3?26b875bad3e46bf6661b16a5d0080870";
 
-    return function(){
+    return function() {
         audio.play();
     }
 };
@@ -205,7 +206,7 @@ var playAudio = function(){
  * @returns {string}
  */
 // 为没有uid表示的访客生成随机身份标识
-var rand = function (uid) {
+var rand = function(uid) {
     if (!!uid) {
         return 'ysf-' + uid;
     }
@@ -222,7 +223,7 @@ var rand = function (uid) {
  *
  * @returns {void}
  */
-var migrate = function () {
+var migrate = function() {
     // migrate uid
     var uid;
     if (/YSF_UID\s*=\s*(.*?)(?=;|$)/i.test(document.cookie)) {
@@ -251,7 +252,7 @@ var migrate = function () {
  * @returns {void}
  * @description 同步 YSF-[appkey]-UID 信息,访客端轮询改动
  */
-var refresh = function (uid) {
+var refresh = function(uid) {
     uid = uid || '';
     var dvc = device(),
         lst = lastUID();
@@ -262,17 +263,17 @@ var refresh = function (uid) {
     // re-device if
     // - first time
     // - user switch
-    if(!dvc || (uid == '' && lst != '')) {
+    if (!dvc || (uid == '' && lst != '')) {
         // dvc change then clear localStorage
         // dvc = rand(uid);
         dvc = uid || dvc || rand(uid);
-        sendMsg('synckey:'+dvc);
+        sendMsg('synckey:' + dvc);
 
     }
 
     cache.device = dvc;
-    localStorage.setItem('YSF-' + cache['appKey'].toUpperCase()+'-UID', uid || dvc);
-    localStorage.setItem('YSF-' + cache['appKey'].toUpperCase()+ '-LAST', uid || '');
+    localStorage.setItem('YSF-' + cache['appKey'].toUpperCase() + '-UID', uid || dvc);
+    localStorage.setItem('YSF-' + cache['appKey'].toUpperCase() + '-LAST', uid || '');
 };
 
 /**
@@ -281,8 +282,8 @@ var refresh = function (uid) {
  * @returns {string}
  * @description  从LocalStorage中获取设备Id
  */
-var device = function () {
-    return localStorage.getItem('YSF-' + cache['appKey'].toUpperCase()+'-UID') || '';
+var device = function() {
+    return localStorage.getItem('YSF-' + cache['appKey'].toUpperCase() + '-UID') || '';
 };
 
 /**
@@ -291,8 +292,8 @@ var device = function () {
  * @returns {string}
  * @description 从LocalStorage中获取 lastUId
  */
-var lastUID = function () {
-    return localStorage.getItem('YSF-' + cache['appKey'].toUpperCase()+ '-LAST') || '';
+var lastUID = function() {
+    return localStorage.getItem('YSF-' + cache['appKey'].toUpperCase() + '-LAST') || '';
 };
 
 /**
@@ -301,30 +302,136 @@ var lastUID = function () {
  * @returns {void}
  * @description 更新设备id
  */
-var updateDevice = function(){
+var updateDevice = function() {
     cache.device = rand();
-    localStorage.setItem('YSF-' + cache['appKey'].toUpperCase()+'-UID', cache.device);
-    sendMsg('synckey:'+ cache.device);
+    localStorage.setItem('YSF-' + cache['appKey'].toUpperCase() + '-UID', cache.device);
+    sendMsg('synckey:' + cache.device);
+};
+
+/**
+ * 重置窗口
+ *
+ */
+var reset = function() {
+    var layerNode = document.getElementById('YSF-PANEL-CORPINFO') || document.getElementById('YSF-PANEL-INFO'),
+        btnNode = document.getElementById('YSF-BTN-HOLDER');
+
+    document.body.removeChild(layerNode);
+    document.body.removeChild(btnNode);
+    ysf.init(cache['imgSrc']);
+    firstBtnClick = true;
+};
+
+/**
+ * 构建代理信息
+ *
+ */
+var buildProxy = function() {
+    if (!!proxy) {
+        return;
+    }
+    // add event listener
+    if (!!window.addEventListener) {
+        window.addEventListener('message', receiveMsg, !1);
+    } else {
+        window.attachEvent('onmessage', receiveMsg);
+    }
+    // build proxy
+    proxy = wrap();
+    proxy.innerHTML = '<iframe style="height:0px; width:0px;" src="' + ysf.RESROOT + 'res/delegate.html?' + (+new Date) + '"></iframe>';
+    proxy = proxy.getElementsByTagName('IFRAME')[0];
+};
+
+/**
+ * 初始化窗口配置
+ *
+ * @param {Number} winType          - 1: 浮层layer 2: 弹窗 3: url
+ */
+var initWinConfig = function() {
+    var screen = window.screen || {};
+    var winParamUtil = {
+        base: ',location=0,menubar=0,scrollbars=0,status=0,toolbar=0,resizable=0',
+        winNoInfo: {
+            width: 600,
+            height: 630,
+            top: Math.max(0, ((screen.height || 0) - 630) / 2),
+            left: Math.max(0, ((screen.width || 0) - 600) / 2),
+        },
+        winHasInfo: {
+            width: 842,
+            height: 632,
+            top: Math.max(0, ((screen.height || 0) - 630) / 2),
+            left: Math.max(0, ((screen.width || 0) - 840) / 2),
+        },
+        layerNoInfo: {
+            param: ''
+        },
+        layerHasInfo: {
+            param: ''
+        }
+    };
+
+    winParamUtil.winNoInfo.param = 'top=' + winParamUtil.winNoInfo.top + ',left=' + winParamUtil.winNoInfo.left + ',width=' + winParamUtil.winNoInfo.width + ',height=' + winParamUtil.winNoInfo.height + winParamUtil.base;
+    winParamUtil.winHasInfo.param = 'top=' + winParamUtil.winHasInfo.top + ',left=' + winParamUtil.winHasInfo.left + ',width=' + winParamUtil.winHasInfo.width + ',height=' + winParamUtil.winHasInfo.height + winParamUtil.base;
+
+    // 移动端平台使用url方式
+    if (util.isMobilePlatform()) {
+        cache['winType'] = 3;
+    }
+
+    // winType 1: 浮层layer 2: 弹窗 3: url
+    switch (cache['winType']) {
+        case 1:
+            winParam = cache['corpInfo'] ? winParamUtil.layerHasInfo : winParamUtil.layerNoInfo;
+            winParam.type = 'layer';
+            break;
+        case 3:
+            winParam = { type: 'url', param: '' }
+            break;
+        default:
+            winParam = cache['corpInfo'] ? winParamUtil.winHasInfo : winParamUtil.winNoInfo;
+            winParam.type = 'win';
+            break;
+    }
+
+};
+
+/**
+ * 创建设备时序
+ *
+ */
+var createDvcTimer = function() {
+    var temp = localStorage.getItem('YSFDVC-' + cache.device),
+        number = 0;
+
+    if (temp != null) number = Number(temp) + 1;
+
+    localStorage.setItem('YSFDVC-' + cache.device, number);
+    cache.dvctimer = number;
 };
 
 
 
 module.exports = {
-	mergeUrl : mergeUrl,
-	query2Object : query2Object,
-	typeof : _typeof,
-	findLocalItems : findLocalItems,
-	clearLocalItems : clearLocalItems,
-	random : random,
-	each : each,
-	serialize : serialize,
-    notification : notification,
-    playAudio : playAudio,
-    rand : rand,
-    migrate : migrate,
-    merge : merge,
-    refresh : refresh,
-    device : device,
-    lastUID : lastUID,
-    updateDevice : updateDevice
+    mergeUrl: mergeUrl,
+    query2Object: query2Object,
+    typeof: _typeof,
+    findLocalItems: findLocalItems,
+    clearLocalItems: clearLocalItems,
+    random: random,
+    each: each,
+    serialize: serialize,
+    notification: notification,
+    playAudio: playAudio,
+    rand: rand,
+    migrate: migrate,
+    merge: merge,
+    refresh: refresh,
+    device: device,
+    lastUID: lastUID,
+    updateDevice: updateDevice,
+    reset: reset,
+    buildProxy: buildProxy,
+    initWinConfig: initWinConfig,
+    createDvcTimer: createDvcTimer
 }
