@@ -81,8 +81,8 @@ class Cache extends EventEmitter {
 		return cache;
 	}
 
-	getItemsInCache(){
-		return cache
+	getItemsInCache(_key){
+		return cache[_key];
 	}
 
 

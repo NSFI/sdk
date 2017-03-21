@@ -322,6 +322,22 @@ var reset = function() {
     firstBtnClick = true;
 };
 
+var wrap = function () {
+    var body = document.createElement('div'),
+        css = body.style,
+        ret = {
+            top: 0, left: 0,
+            visibility: 'hidden',
+            position: 'absolute',
+            width: '1px', height: '1px'
+        };
+    each(ret, function (k, v) {
+        css[k] = v;
+    });
+    document.body.appendChild(body);
+    return body;
+};
+
 /**
  * 构建代理信息
  *
@@ -401,13 +417,13 @@ var initWinConfig = function() {
  *
  */
 var createDvcTimer = function() {
-    var temp = localStorage.getItem('YSFDVC-' + cache.device),
+    var temp = localStorage.getItem('YSFDVC-' + cache.getItemsInCache('device')),
         number = 0;
 
     if (temp != null) number = Number(temp) + 1;
 
-    localStorage.setItem('YSFDVC-' + cache.device, number);
-    cache.dvctimer = number;
+    localStorage.setItem('YSFDVC-' + cache.getItemsInCache('device'), number);
+    cache.setItemsInCache({'dvctimer': number});
 };
 
 
