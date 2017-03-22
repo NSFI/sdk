@@ -49,7 +49,7 @@ class SDK extends EventEmitter {
     }
 
     init(sdkURL) {
-    	var self = this;
+        var self = this;
         var init = function() {
             self.entry({
                 src: sdkURL
@@ -71,22 +71,22 @@ class SDK extends EventEmitter {
 
         setTimeout(function() {
             util.ajax({
-                url: ysf.DOMAIN + 'webapi/user/dvcSession.action?k=' + cache['appKey'] + '&d=' + cache['device'] + '&f=' + cache['uid'],
+                url: self.DOMAIN + 'webapi/user/dvcSession.action?k=' + cache.getItemsInCache('appKey') + '&d=' + cache.getItemsInCache('device') + '&f=' + cache.getItemsInCache('uid'),
                 success: function(json) {
                     if (json.code == 200) {
-                        cache['dvcswitch'] = json.result.dvcSwitch; //|| json.result.dvcSwitch
-                        cache['pushswitch'] = json.result.pushSwitch || 0;
-                        cache['pushmsgid'] = json.result.batchIdList || 0;
+                        cache.setItemsInCache({'dvcSwitch': json.result.dvcSwitch}); //|| json.result.dvcSwitch
+                        cache.setItemsInCache({'pushswitch': json.result.pushSwitch || 0});
+                        cache.setItemsInCache({'pushmsgid': json.result.batchIdList || 0});
                         init();
                     } else {
-                        cache['dvcswitch'] = 0;
-                        cache['pushswitch'] = 0;
+                    	cache.setItemsInCache({'dvcSwitch': 0});
+                    	cache.setItemsInCache({'pushSwitch': 0});
                         init();
                     }
                 },
                 error: function() {
-                    cache['dvcswitch'] = 0;
-                    cache['pushswitch'] = 0;
+                    cache.setItemsInCache({'dvcSwitch': 0});
+                    cache.setItemsInCache({'pushSwitch': 0});
                     init();
                 }
             });
@@ -94,50 +94,6 @@ class SDK extends EventEmitter {
     }
 
     /**************接口层*************/
-
-    /**
-     * 未读消息
-     */
-    unread() {
-
-        }
-        /**
-         * 配置方式
-         */
-    config() {
-
-    }
-
-    /**
-     * 商品链接
-     *
-     */
-    product() {
-
-    }
-
-    /**
-     * 事件监听
-     *
-     */
-    on() {
-
-    }
-
-    /**
-     * 登出
-     *
-     */
-    logoff() {
-
-    }
-
-    /**
-     * 打开访客端窗口
-     */
-    open() {
-
-    }
 
     /**
      * 构建访客相关样式
@@ -288,7 +244,7 @@ class SDK extends EventEmitter {
 
         util.createDvcTimer();
 
-        this.openInline(div, cache['dvcswitch']);
+        this.openInline(div, cache.getItemsInCache('dvcswitch'));
 
     }
 
@@ -410,24 +366,22 @@ class SDK extends EventEmitter {
      * @param {String} url 			    	- 打开URL
      * @param {Object} event 				- 新开窗口参数
      */
-    openLayer(function() {
-        return function(url, event) {
-            var layerNode = document.getElementById('YSF-PANEL-CORPINFO') || document.getElementById('YSF-PANEL-INFO'),
-                btnNode = document.getElementById('YSF-BTN-HOLDER');
+    openLayer(url, event) {
+        var layerNode = document.getElementById('YSF-PANEL-CORPINFO') || document.getElementById('YSF-PANEL-INFO'),
+            btnNode = document.getElementById('YSF-BTN-HOLDER');
 
-            if (!layerNode) return;
+        if (!layerNode) return;
 
-            // modify btnNode style
-            btnNode.style.display = 'none';
+        // modify btnNode style
+        btnNode.style.display = 'none';
 
-            // modify layerNode style
-            layerNode.className = 'ysf-chat-layer ysf-chat-layeropen';
-            layerNode.setAttribute('data-switch', 1);
-            try {
-                message.sendChatMsg('status', { layerOpen: 1 });
-            } catch (ex) {}
-        }
-    })()
+        // modify layerNode style
+        layerNode.className = 'ysf-chat-layer ysf-chat-layeropen';
+        layerNode.setAttribute('data-switch', 1);
+        try {
+            message.sendChatMsg('status', { layerOpen: 1 });
+        } catch (ex) {}
+    }
 
     /**
      * 新窗口打开
@@ -435,22 +389,18 @@ class SDK extends EventEmitter {
      * @param {String} url 			    	- 打开URL
      * @param {Object} event 				- 新开窗口参数
      */
-    openWin(function() {
-        return function(url, event) {
-            window.open(url, 'YSF_SERVICE_' + (cache.appKey || '').toUpperCase(), event.param);
-        }
-    })()
+    openWin(url, event) {
+        window.open(url, 'YSF_SERVICE_' + (cache.getItemsInCache('appKey') || '').toUpperCase(), event.param);
+    }
 
     /**
      * 新标签打开
      * @param {String} url 			    	- 打开URL
      * @param {Object} event 				- 新开窗口参数
      */
-    openUrl(function() {
-        return function(url, event) {
-            window.open(url, 'YSF_SERVICE_' + (cache.appKey || '').toUpperCase(), event.param);
-        }
-    })()
+    openUrl(url, event) {
+        window.open(url, 'YSF_SERVICE_' + (cache.getItemsInCache('appKey') || '').toUpperCase(), event.param);
+    }
 
     /**
      * 消息提醒和气泡管理
@@ -546,7 +496,7 @@ class SDK extends EventEmitter {
         // merge user information
         util.merge(options);
         // check app key
-        if (!!cache.appKey) {
+        if (!!cache.getItemsInCache('appKey')) {
             // check device id
             util.refresh(options.uid);
             // log user visit path
@@ -573,16 +523,16 @@ class SDK extends EventEmitter {
      * @return {String}                  	聊天地址
      */
     url() {
-        if (!cache.appKey) {
+        if (!cache.getItemsInCache('appKey')) {
             return '';
         }
         // generator query object
         var opt = {
-            k: cache.appKey,
+            k: cache.getItemsInCache('appKey'),
             u: util.device(),
-            gid: cache.groupid || 0,
-            sid: cache.staffid || 0,
-            dvctimer: cache.dvctimer || 0
+            gid: cache.getItemsInCache('groupid') || 0,
+            sid: cache.getItemsInCache('staffid') || 0,
+            dvctimer: cache.getItemsInCache('dvctimer') || 0
         };
         // merge user information
         util.each({
@@ -590,14 +540,14 @@ class SDK extends EventEmitter {
             e: 'email',
             m: 'mobile'
         }, function(k, v) {
-            var it = cache[v];
+            var it = cache.getItemsInCache('v');
             if (!!it) {
                 opt[k] = it;
             }
         });
         opt.t = encodeURIComponent(document.title);
         // generator chat url
-        return ysf.IMROOT + '?' + serialize(opt);
+        return this.IMROOT + '?' + serialize(opt);
     }
 
     /**
@@ -682,20 +632,20 @@ class SDK extends EventEmitter {
             case 'layer':
                 ysf.openLayer(url, winParam);
                 try {
-                    if (firstBtnClick && cache['dvcswitch'] == 0 && cache['pushswitch'] == 0) {
-                        sendChatMsg('doconnect', { doconnect: 1 });
-                        firstBtnClick = false;
+                    if (this.firstBtnClick && cache.getItemsInCache('dvcswitch') == 0 && cache.getItemsInCache('pushswitch') == 0) {
+                        message.sendChatMsg('doconnect', { doconnect: 1 });
+                        this.firstBtnClick = false;
                     }
                 } catch (ex) {};
 
-                if (cache['dvcswitch'] == 0 && cache['pushswitch'] == 1 || CircleNumberFlag > 0) {
-                    sendChatMsg('dopushmsgread', { ids: msgSessionIds });
-                    msgSessionIds = [];
+                if (cache.getItemsInCache('dvcswitch') == 0 && cache.getItemsInCache('pushswitch') == 1 || this.CircleNumberFlag > 0) {
+                    message.sendChatMsg('dopushmsgread', { ids: this.msgSessionIds });
+                    this.msgSessionIds = [];
                 }
-                ysf.NotifyMsgAndBubble({ category: 'clearCircle' });
+                this.NotifyMsgAndBubble({ category: 'clearCircle' });
                 break;
             case 'url':
-                ysf.openUrl(url, winParam);
+                this.openUrl(url, winParam);
                 break
         }
 
@@ -706,13 +656,14 @@ class SDK extends EventEmitter {
      * @param {String} sdkURL			- SDK图片地址
      */
     init(sdkURL) {
+        var self = this;
         var init = function() {
-            ysf.entry({
+            self.entry({
                 src: sdkURL
             });
 
-            if (cache['winType'] == 1) {
-                ysf.entryPanel(cache['corpInfo']);
+            if (cache.getItemsInCache('winType') == 1) {
+                ysf.entryPanel(cache.getItemsInCache('corpInfo'));
             }
         };
 
