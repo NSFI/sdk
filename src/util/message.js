@@ -4,7 +4,7 @@
  * @author:   波比(｡･∀･)ﾉﾞ
  * @date:     2016-10-25  下午8:29
  */
-
+const cache = require('../cache');
 /**
  * 向浮层模式窗口发送消息
  *
@@ -27,7 +27,7 @@ var visit = function() {
         query = serialize({
             uri: location.href,
             title: document.title,
-            appkey: cache.appKey
+            appkey: cache.getItemsInCache('appKey')
         });
     // get device id from cookie X-[APPKEY]-DEVICE
     image.src = ysf.DOMAIN + 'webapi/user/accesshistory.action?' + query;
@@ -57,7 +57,7 @@ var syncProfile = function() {
         avatar: '',
         profile: 'data'
     }, function(k, v) {
-        var it = cache[v] || cache[k];
+        var it = cache.getItemsInCache(v) || cache.getItemsInCache(k);
         if (it != null) {
             user[k] = it
         }

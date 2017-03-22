@@ -10,6 +10,7 @@ const EventEmitter = require('events').EventEmitter;
 class SDK extends EventEmitter {
     constructor(options) {
         super(options);
+        window.ysf = this;
         this.ROOT = options.ROOT || '';
         this.VERSION = '2.8.0'; //版本信息
         this.winParam = options.winParam || {}; // 窗口信息参数

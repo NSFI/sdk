@@ -6,7 +6,7 @@
  */
 
 var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz'; // 随机数种子
-
+const cache = require('../cache');
 /**
  * mergeUrl
  * @param url
@@ -123,7 +123,7 @@ var each = function(o, func) {
  */
 var merge = function(o) {
     each(o, function(k, v) {
-        cache[k] = v;
+        cache.setItemsInCache({k,v});
     });
 };
 
@@ -372,20 +372,21 @@ var initWinConfig = function() {
 
     // 移动端平台使用url方式
     if (util.isMobilePlatform()) {
-        cache['winType'] = 3;
+        cache.setItemsInCache({'winType': 3});
     }
 
     // winType 1: 浮层layer 2: 弹窗 3: url
-    switch (cache['winType']) {
+    var type = cache.getItemsInCache('winType');
+    switch (type) {
         case 1:
-            winParam = cache['corpInfo'] ? winParamUtil.layerHasInfo : winParamUtil.layerNoInfo;
+            winParam = cache.getItemsInCache('corpInfo') ? winParamUtil.layerHasInfo : winParamUtil.layerNoInfo;
             winParam.type = 'layer';
             break;
         case 3:
             winParam = { type: 'url', param: '' }
             break;
         default:
-            winParam = cache['corpInfo'] ? winParamUtil.winHasInfo : winParamUtil.winNoInfo;
+            winParam = cache.getItemsInCache('corpInfo') ? winParamUtil.winHasInfo : winParamUtil.winNoInfo;
             winParam.type = 'win';
             break;
     }
