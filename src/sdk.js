@@ -19,23 +19,33 @@ class SDK extends EventEmitter {
         this.CircleNumberFlag = 0;
         this.msgSessionIds = [];
 
+        this.build();
+        this.init(options);
+    }
+
+    /**
+     * sdk build
+     *
+     */
+    build() {
+    	var self = this;
         // App init and SDK build
         util.each({
-            DOMAIN: ysf.ROOT + '/',
+            DOMAIN: self.ROOT + '/',
             IMROOT: (function() {
-                var ret = window.__YSFWINTYPE__ == 1 ? (ysf.ROOT + '/client/iframe') : (ysf.ROOT + '/client');
+                var ret = window.__YSFWINTYPE__ == 1 ? (self.ROOT + '/client/iframe') : (self.ROOT + '/client');
 
                 if (util.isMobilePlatform()) {
-                    ret = ysf.ROOT + '/client';
+                    ret = self.ROOT + '/client';
                 }
 
                 return ret;
 
             })(),
-            RESROOT: ysf.ROOT + '/sdk/'
+            RESROOT: self.ROOT + '/sdk/'
         }, function(k, v) {
-            if (ysf[k] == null) {
-                ysf[k] = v;
+            if (self[k] == null) {
+                self[k] = v;
             }
         });
 
@@ -44,10 +54,12 @@ class SDK extends EventEmitter {
 
         // build proxy
         util.buildProxy();
+    };
 
-        this.init(options);
-    }
-
+    /**
+     * init
+     *
+     */
     init(sdkURL) {
         var self = this;
         var init = function() {
@@ -74,19 +86,19 @@ class SDK extends EventEmitter {
                 url: self.DOMAIN + 'webapi/user/dvcSession.action?k=' + cache.getItemsInCache('appKey') + '&d=' + cache.getItemsInCache('device') + '&f=' + cache.getItemsInCache('uid'),
                 success: function(json) {
                     if (json.code == 200) {
-                        cache.setItemsInCache({'dvcSwitch': json.result.dvcSwitch}); //|| json.result.dvcSwitch
-                        cache.setItemsInCache({'pushswitch': json.result.pushSwitch || 0});
-                        cache.setItemsInCache({'pushmsgid': json.result.batchIdList || 0});
+                        cache.setItemsInCache({ 'dvcSwitch': json.result.dvcSwitch }); //|| json.result.dvcSwitch
+                        cache.setItemsInCache({ 'pushswitch': json.result.pushSwitch || 0 });
+                        cache.setItemsInCache({ 'pushmsgid': json.result.batchIdList || 0 });
                         init();
                     } else {
-                    	cache.setItemsInCache({'dvcSwitch': 0});
-                    	cache.setItemsInCache({'pushSwitch': 0});
+                        cache.setItemsInCache({ 'dvcSwitch': 0 });
+                        cache.setItemsInCache({ 'pushSwitch': 0 });
                         init();
                     }
                 },
                 error: function() {
-                    cache.setItemsInCache({'dvcSwitch': 0});
-                    cache.setItemsInCache({'pushSwitch': 0});
+                    cache.setItemsInCache({ 'dvcSwitch': 0 });
+                    cache.setItemsInCache({ 'pushSwitch': 0 });
                     init();
                 }
             });
