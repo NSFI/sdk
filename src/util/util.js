@@ -339,26 +339,6 @@ var wrap = function () {
 };
 
 /**
- * 构建代理信息
- *
- */
-var buildProxy = function() {
-    if (!!proxy) {
-        return;
-    }
-    // add event listener
-    if (!!window.addEventListener) {
-        window.addEventListener('message', receiveMsg, !1);
-    } else {
-        window.attachEvent('onmessage', receiveMsg);
-    }
-    // build proxy
-    proxy = wrap();
-    proxy.innerHTML = '<iframe style="height:0px; width:0px;" src="' + ysf.RESROOT + 'res/delegate.html?' + (+new Date) + '"></iframe>';
-    proxy = proxy.getElementsByTagName('IFRAME')[0];
-};
-
-/**
  * 初始化窗口配置
  *
  * @param {Number} winType          - 1: 浮层layer 2: 弹窗 3: url
@@ -447,7 +427,6 @@ module.exports = {
     lastUID: lastUID,
     updateDevice: updateDevice,
     reset: reset,
-    buildProxy: buildProxy,
     initWinConfig: initWinConfig,
     createDvcTimer: createDvcTimer
 }

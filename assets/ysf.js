@@ -27,6 +27,130 @@
 	 * @param {Function} util.playAudio				- 播放飘窗声音
 	 */
 	var util = {
+		isMobilePlatform : function(){
+			if (/(iPhone|iPod|iOS|Android)/i.test(navigator.userAgent)) {
+				return true;
+			}
+			return false;
+		},
+		createAjax : function(){
+			var xmlDom = null;
+			var msxml = [
+				'Msxml2.XMLHTTP.6.0',
+				'Msxml2.XMLHTTP.3.0',
+				'Msxml2.XMLHTTP.4.0',
+				'Msxml2.XMLHTTP.5.0',
+				'MSXML2.XMLHTTP',
+				'Microsoft.XMLHTTP'
+			];
+
+			if(window.XMLHttpRequest){
+				xmlDom = new XMLHttpRequest();
+				if('withCredentials' in xmlDom){
+					return xmlDom;
+				}
+			}
+
+
+			if(window.xDomainRequest){
+				xmlDom = new Window.xDomainRequest();
+			}
+
+			return xmlDom;
+		},
+		ajax : function (conf) {
+			var type = conf.type || 'get',
+				url = conf.url,
+				data = conf.data,
+				success = conf.success,
+				error = conf.error;
+
+			var xhr = util.createAjax();
+
+			if(!xhr) {error();return;}
+
+			try{ xhr.open(type, url); }catch(ex){ error();
+				return;
+			}
+
+			// 监听状态改变
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState == 4) {
+					if (xhr.status === 200) {
+						success(eval("(" + xhr.responseText + ")"));
+					} else {
+						error()
+					}
+				}
+			};
+
+			// 请求类型, 仅支持GET和POST两种方式
+
+			if (type.toUpperCase() == "GET" ) {
+				xhr.send(null);
+			}else{
+				xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+				xhr.send(data);
+			}
+
+		},
+		findLocalItems: function(query, noJson){
+			var i, results = [], value;
+			for (i in localStorage) {
+					if (i.match(query) || (!query && typeof i === 'string')) {
+						value = !noJson ? localStorage.getItem(i) : JSON.parse(localStorage.getItem(i));
+						results.push({key:i,val:value});
+					}
+			}
+			return results;
+		},
+		clearLocalItems : function(list){
+			for(var i=0;i<list.length;i++){
+				window.localStorage.removeItem(list[i].key);
+			}
+		},
+		addEvent: function(target, eventType, callback) {
+			if (target.addEventListener) {
+				target.addEventListener(eventType, callback, false);
+			} else if (target.attachEvent) {
+				target.attachEvent('on' + eventType, callback);
+			}
+		},
+		mergeUrl: function(url, options){
+			var arr = url.split('?'),
+				furl= arr.shift(),
+				origin = util.query2Object(arr.shift() || '', '&');
+			// merge data
+			for(var key in options){
+				origin[key] = options[key]
+			}
+
+			// sarialize
+			for(var key in origin){
+				arr.push(key + '=' + (origin[key] || ''))
+			}
+
+			return furl + '?' + arr.join('&');
+		},
+		query2Object : function(str, reg){
+			var r = str.split(reg),
+				c = {};
+			for(var i=0;i<r.length;i++){
+				var itm = r[i],
+					tmp = (itm || '').split('='),
+					key = tmp.shift();
+				if(!key) continue;
+				c[decodeURIComponent(key)] = decodeURIComponent(tmp.join('='));
+			}
+
+			return c;
+		},
+		isObject: function(obj) {
+			return ({}).toString.call(obj).toLowerCase() === '[object object]';
+		},
+		isFunction : function(obj){
+			return ({}).toString.call(obj).toLowerCase() === '[object function]';
+		},
 		"notification" : (function(){
 			var notify, timer;
 			return function(msg){
@@ -63,11 +187,13 @@
 			}
 		})(),
 		playAudio : (function(){
-			var audio = document.createElement('audio');
-			audio.src = window.__YSFSDKADR__ + "/prd/res/audio/message.mp3?26b875bad3e46bf6661b16a5d0080870";
+			if(window.__YSFSDKADR__){
+				var audio = document.createElement('audio');
+				audio.src = window.__YSFSDKADR__ + "/prd/res/audio/message.mp3?26b875bad3e46bf6661b16a5d0080870";
 
-			return function(){
-				audio.play();
+				return function(){
+					audio.play();
+				}
 			}
 		})()
 	};
@@ -297,7 +423,9 @@
 			email: '',
 			mobile: '',
 			avatar : '',
-			profile: 'data'
+			profile: 'data',
+			bid: '',
+			level : ''
 		}, function (k, v) {
 			var it = cache[v] || cache[k];
 			if (it != null) {
@@ -340,6 +468,7 @@
 	 * @param data
 	 */
 	var syncCustomProfile = function(data){
+		syncProfile();
 		sendMsg('PRODUCT:' + serialize(data));
 	};
 
@@ -363,19 +492,15 @@
 	var msgNotifyLock = (function(){
 		var timer = null;
 		return function(data, callback){
-			var key = ('YSFMSG-' + cache['appKey'] + '-'+data.id).toUpperCase();
-			if(timer){
-				clearTimeout(timer);
-			}
-
 			setTimeout(function(){
+				var key = ('YSFMSG-' + cache['appKey'] + '-'+data.id).toUpperCase();
 				if(window.localStorage.getItem(key) == null){
 					window.localStorage.setItem(key, 1);
 					callback(true);
 				};
-
 				callback(false);
 			}, cache['dvcTimer'] * 100);
+			
 		}
 	})();
 
@@ -568,6 +693,54 @@
 
 	};
 
+		/**
+	 * 初始化窗口配置
+	 *
+	 * @param {Number} winType			- 1: 浮层layer 2: 弹窗 3: url
+	 */
+	var initWinConfigTrade = function(){
+		var screen = window.screen || {};
+		var winParamUtil = {
+			base : ',location=0,menubar=0,scrollbars=0,status=0,toolbar=0,resizable=0',
+			winNoInfo : {
+				width : 980,
+				height : 632,
+				top : Math.max(0, ((screen.height || 0) - 630) / 2),
+				left : Math.max(0, ((screen.width || 0) - 600) / 2 ),
+			},
+			winHasInfo : {
+				width  : 980,
+				height: 632,
+				top : Math.max(0, ((screen.height || 0) - 630) / 2),
+				left : Math.max(0, ((screen.width || 0) - 840) / 2 ),
+			}
+		};
+
+		winParamUtil.winNoInfo.param = 	'top='+ winParamUtil.winNoInfo.top + ',left='+ winParamUtil.winNoInfo.left + ',width=' + winParamUtil.winNoInfo.width  + ',height=' + winParamUtil.winNoInfo.height + winParamUtil.base;
+		winParamUtil.winHasInfo.param  =  'top='+ winParamUtil.winHasInfo.top + ',left='+ winParamUtil.winHasInfo.left + ',width=' + winParamUtil.winHasInfo.width  + ',height=' + winParamUtil.winHasInfo.height + winParamUtil.base;
+
+		// 移动端平台使用url方式
+		if(util.isMobilePlatform()){
+			cache['winType'] = 3;
+		}
+
+		// winType 1: 浮层layer 2: 弹窗 3: url
+		switch(cache['winType']){
+			case 1 :
+				winParam = cache['corpInfo'] ? winParamUtil.layerHasInfo : winParamUtil.layerNoInfo;
+				winParam.type = 'layer';
+				break;
+			case 3 :
+				winParam = {type : 'url', param : ''}
+				break;
+			default:
+				winParam = cache['corpInfo'] ? winParamUtil.winHasInfo : winParamUtil.winNoInfo;
+				winParam.type = 'win';
+				break;
+		}
+
+	};
+
 	/**
 	 * 创建设备时序
 	 *
@@ -610,9 +783,7 @@
 	 * @param {Number} status					- 浮层模式标识
 	 */
 	ysf.openInline = function (parent, status) {
-		var url = ysf.url.apply(
-			ysf, arguments
-		);
+		var url = ysf.url.apply(ysf);
 		if (!url) {
 			return;
 		}
@@ -935,6 +1106,9 @@
 					audio:function(msg){
 						return '[音频]';
 					},
+					file:function(msg){
+						return '[文件]'+msg.name 
+					},
 					text : function(msg){
 						return msg;
 					}
@@ -998,13 +1172,38 @@
 			syncProfile();
 
 			// init window type config
-			initWinConfig();
+			if (options.bid) {
+				initWinConfigTrade();
+			}else{
+				initWinConfig();
+			}
 
 			// MSG Numbers Init
 
 
 		}
 	};
+
+	/**
+	* 平台电商版本的更新配置信息
+	*
+	*/
+	ysf.configTrade = function (options) {
+		if (!options) return;
+		// merge user information
+		merge(options);
+		if (!!cache.appKey) {
+			// check device id
+			refresh(options.uid);
+			// log user visit path
+			visit();
+			// sync crm information to qiyu
+			syncProfile();
+
+			// init window type config
+			initWinConfig();
+		}
+	}
 
 	/**
 	 * 打开客服聊天窗口
@@ -1015,7 +1214,7 @@
 	 * @param  {String} options.email  		- 邮箱地址
 	 * @return {String}                  	聊天地址
 	 */
-	ysf.url = function () {
+	ysf.url = function (openTrade) {
 		if (!cache.appKey) {
 			return '';
 		}
@@ -1025,8 +1224,13 @@
 			u: device(),
 			gid: cache.groupid || 0,
 			sid: cache.staffid || 0,
-			dvctimer : cache.dvctimer || 0
+			qtype : cache.qtype || 0,
+			dvctimer : cache.dvctimer || 0,
+			robotShuntSwitch: cache.robotShuntSwitch || 0
 		};
+		if (cache.bid) {
+			opt.bid = cache.bid;
+		}
 		// merge user information
 		each({
 			n: 'name',
@@ -1040,6 +1244,7 @@
 		});
 		opt.t = encodeURIComponent(document.title);
 		// generator chat url
+		if (openTrade) return ysf.IMROOT + '/trade' + '?' + serialize(opt);
 		return ysf.IMROOT + '?' + serialize(opt);
 	};
 
@@ -1097,8 +1302,11 @@
 		};
 
 		return function(config){
-
 			config = format(config);
+			//区分不同商户
+			if(!!cache.bid){
+				config.bid = cache.bid;
+			}
 			syncCustomProfile(config);
 		}
 	})();
@@ -1110,9 +1318,12 @@
 	 */
 	ysf.open = function () {
 		// generator url
-		var url = ysf.url.apply(
-			ysf, arguments
-		);
+		if (cache.bid) {
+			var url = ysf.url.apply(ysf, [true]);
+		}else{
+			var url = ysf.url.apply(ysf);
+		}
+		
 		if (!url) {
 			return;
 		}
@@ -1143,6 +1354,29 @@
 
 	};
 
+	/**
+	* 平台电商--打开客服聊天窗口
+	*
+	*  @return {Void}
+	*/
+	ysf.openTrade = function() {
+		// generator url
+		var url = ysf.url.apply(
+			ysf, [true]
+		);
+		if (!url) {
+			return;
+		}
+
+		switch(winParam.type){
+			case 'win' :
+				ysf.openWin(url, winParam);
+				break;
+			case 'url' :
+				ysf.openUrl(url, winParam);
+				break;
+		}
+	};
 	/*====================== App Init and SDK Build ==================*/
 	(function () {
 		// init config
@@ -1193,29 +1427,36 @@
 		 * @param {Number} pushSwitch		  - 消息推送开关 1: 开 0: 关
 		 * @param {Number} batchIdList		  - 要申请的消息Id
 		 */
-
-		setTimeout(function(){
-			util.ajax({
-				url: ysf.DOMAIN + 'webapi/user/dvcSession.action?k='+cache['appKey']+'&d='+cache['device']+'&f='+cache['uid'],
-				success: function(json){
-					if(json.code == 200){
-						cache['dvcswitch'] = json.result.dvcSwitch ; //|| json.result.dvcSwitch
-						cache['pushswitch'] = json.result.pushSwitch || 0;
-						cache['pushmsgid'] = json.result.batchIdList || 0;
-						init();
-					}else{
+		// 浮层模式下开启请求
+		if(window.__YSFWINTYPE__ == 1) {
+			setTimeout(function () {
+				util.ajax({
+					url: ysf.DOMAIN + 'webapi/user/dvcSession.action?k=' + cache['appKey'] + '&d=' + cache['device'] + '&f=' + cache['uid'],
+					type: 'post',
+					success: function (json) {
+						if (json.code == 200) {
+							cache['dvcswitch'] = json.result.dvcSwitch; //|| json.result.dvcSwitch
+							cache['pushswitch'] = json.result.pushSwitch || 0;
+							cache['pushmsgid'] = json.result.batchIdList || 0;
+							init();
+						} else {
+							cache['dvcswitch'] = 0;
+							cache['pushswitch'] = 0;
+							init();
+						}
+					},
+					error: function () {
 						cache['dvcswitch'] = 0;
 						cache['pushswitch'] = 0;
 						init();
 					}
-				},
-				error: function(){
-					cache['dvcswitch'] = 0;
-					cache['pushswitch'] = 0;
-					init();
-				}
-			});
-		}, 1000);
+				});
+			}, 1000);
+		}else{
+			cache['dvcswitch'] = 0;
+			cache['pushswitch'] = 0;
+			init();
+		}
 
 	};
 
@@ -1281,4 +1522,24 @@
 			total: cache['notifyNumber']
 		}
 	};
+	/**
+	 * 清除拖拽的缓存
+	 */
+	ysf.clearDragresize = function(name){
+		try{
+
+			var corp =  window.location.hostname.split('.')[0];
+			var list = ['callcenter', 'session', 'qualitysession', 'qualitycallsession', 'worksheet', 'callflow', 'leave', 'monitor', 'usercenter']
+
+			if(list.indexOf(name) > -1){
+				util.clearLocalItems(util.findLocalItems(new RegExp(corp + '-' + name, 'ig')))
+			}else{
+				for(var i =0; i<list.length; i++){
+					util.clearLocalItems(util.findLocalItems(new RegExp(corp + '-' + list[i], 'ig')))
+				}
+			}
+		}catch(err){
+			// ignore
+		}
+	}
 })();

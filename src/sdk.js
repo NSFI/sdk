@@ -28,7 +28,7 @@ class SDK extends EventEmitter {
      *
      */
     build() {
-    	var self = this;
+        var self = this;
         // App init and SDK build
         util.each({
             DOMAIN: self.ROOT + '/',
@@ -49,11 +49,31 @@ class SDK extends EventEmitter {
             }
         });
 
+        /**
+         * 构建代理信息
+         *
+         */
+        var buildProxy = function() {
+            if (!!self.proxy) {
+                return;
+            }
+            // add event listener
+            if (!!window.addEventListener) {
+                window.addEventListener('message', receiveMsg, !1);
+            } else {
+                window.attachEvent('onmessage', receiveMsg);
+            }
+            // build proxy
+            self.proxy = util.wrap();
+            self.proxy.innerHTML = '<iframe style="height:0px; width:0px;" src="' + self.RESROOT + 'res/delegate.html?' + (+new Date) + '"></iframe>';
+            self.proxy = self.proxy.getElementsByTagName('IFRAME')[0];
+        };
+
         // migrate cookie to storage
         util.migrate();
 
         // build proxy
-        util.buildProxy();
+        buildProxy();
     };
 
     /**
