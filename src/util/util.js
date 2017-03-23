@@ -123,7 +123,7 @@ var each = function(o, func) {
  */
 var merge = function(o) {
     each(o, function(k, v) {
-        cache.setItemsInCache({k,v});
+        cache.setItemsInCache({ k, v });
     });
 };
 
@@ -322,16 +322,18 @@ var reset = function() {
     firstBtnClick = true;
 };
 
-var wrap = function () {
+var wrap = function() {
     var body = document.createElement('div'),
         css = body.style,
         ret = {
-            top: 0, left: 0,
+            top: 0,
+            left: 0,
             visibility: 'hidden',
             position: 'absolute',
-            width: '1px', height: '1px'
+            width: '1px',
+            height: '1px'
         };
-    each(ret, function (k, v) {
+    each(ret, function(k, v) {
         css[k] = v;
     });
     document.body.appendChild(body);
@@ -372,7 +374,7 @@ var initWinConfig = function() {
 
     // 移动端平台使用url方式
     if (util.isMobilePlatform()) {
-        cache.setItemsInCache({'winType': 3});
+        cache.setItemsInCache({ 'winType': 3 });
     }
 
     // winType 1: 浮层layer 2: 弹窗 3: url
@@ -404,7 +406,14 @@ var createDvcTimer = function() {
     if (temp != null) number = Number(temp) + 1;
 
     localStorage.setItem('YSFDVC-' + cache.getItemsInCache('device'), number);
-    cache.setItemsInCache({'dvctimer': number});
+    cache.setItemsInCache({ 'dvctimer': number });
+};
+
+var isMobilePlatform = function() {
+    if (/(iPhone|iPod|iOS|Android)/i.test(navigator.userAgent)) {
+        return true;
+    }
+    return false;
 };
 
 
@@ -429,5 +438,7 @@ module.exports = {
     updateDevice: updateDevice,
     reset: reset,
     initWinConfig: initWinConfig,
-    createDvcTimer: createDvcTimer
+    createDvcTimer: createDvcTimer,
+    isMobilePlatform: isMobilePlatform,
+    wrap: wrap
 }

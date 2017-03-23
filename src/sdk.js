@@ -8,6 +8,8 @@
 const EventEmitter = require('events').EventEmitter;
 const util = require('./util/util');
 const message = require('./util/message');
+const ajax = require('./util/ajax');
+const dom = require('./util/dom');
 
 class SDK extends EventEmitter {
     constructor(options) {
@@ -62,9 +64,9 @@ class SDK extends EventEmitter {
             }
             // add event listener
             if (!!window.addEventListener) {
-                window.addEventListener('message', receiveMsg, !1);
+                window.addEventListener('message', message.receiveMsg, !1);
             } else {
-                window.attachEvent('onmessage', receiveMsg);
+                window.attachEvent('onmessage', message.receiveMsg);
             }
             // build proxy
             self.proxy = util.wrap();
@@ -105,7 +107,7 @@ class SDK extends EventEmitter {
          */
 
         setTimeout(function() {
-            util.ajax({
+            ajax({
                 url: self.DOMAIN + 'webapi/user/dvcSession.action?k=' + cache.getItemsInCache('appKey') + '&d=' + cache.getItemsInCache('device') + '&f=' + cache.getItemsInCache('uid'),
                 success: function(json) {
                     if (json.code == 200) {
@@ -196,66 +198,7 @@ class SDK extends EventEmitter {
      * @param  {String} options.src             - 图片地址
      */
     entry(options) {
-        var self = this;
-        // 构建父容器
-        var buildHolder = function() {
-            var holder = document.createElement('div'),
-                customStr = "YSF-CUSTOM-ENTRY-" + window.__YSFTHEMELAYEROUT__;
-
-            if (window.__YSFTHEMELAYEROUT__) {
-                holder.className = 'layer-' + window.__YSFTHEMELAYEROUT__;
-            }
-
-            holder.setAttribute('id', 'YSF-BTN-HOLDER');
-
-            if (cache.getItemsInCache('hidden') == 1) holder.style.display = 'none';
-
-            document.body.appendChild(holder);
-
-            holder.onclick = function() {
-                self.open();
-            };
-
-            holder.innerHTML = '<div id="' + customStr + '"><img src="' + options.src + '"/></div>';
-            return holder
-        };
-
-
-        // 构建circle子节点
-
-        var buildCircle = function(parent) {
-            var circle = document.createElement('span');
-            circle.setAttribute('id', 'YSF-BTN-CIRCLE');
-            parent.appendChild(circle)
-        };
-
-        // 构建Bubble子节点
-        var buildBubble = function(parent) {
-            var container = document.createElement('div'),
-                content = document.createElement('div'),
-                arrow = document.createElement('span'),
-                close = document.createElement('span');
-
-            container.setAttribute('id', 'YSF-BTN-BUBBLE');
-            content.setAttribute('id', 'YSF-BTN-CONTENT');
-            arrow.setAttribute('id', 'YSF-BTN-ARROW');
-            close.setAttribute('id', 'YSF-BTN-CLOSE');
-
-            close.onclick = function(event) {
-                event.stopPropagation();
-                event.preventDefault();
-                self.NotifyMsgAndBubble({ category: 'clearCircle' });
-            };
-
-            parent.appendChild(container);
-            container.appendChild(content);
-            container.appendChild(arrow);
-            container.appendChild(close);
-        };
-
-        var parent = buildHolder();
-        buildCircle(parent);
-        buildBubble(parent);
+        dom.buildentry(this);
     }
 
     /**
@@ -294,7 +237,7 @@ class SDK extends EventEmitter {
      * @param  {Number} config.interval         - 关闭后再次打开时间
      * @return {Void}
      */
-    invite(function() {
+    invite() {
         var nWrap, nBody, nText, xConf,
             doc = document.createDocumentFragment();
         var buildInvite = function() {
@@ -393,7 +336,7 @@ class SDK extends EventEmitter {
                 cache.onackdone = doCheck;
             }
         };
-    })()
+    }
 
     /**
      * 浮层样式打开
@@ -686,7 +629,7 @@ class SDK extends EventEmitter {
      * @param  {Number} config.hide         - 是否要在用户端隐藏，0为显示，1为隐藏，默认为显示。
      * @return {Void}
      */
-    product(function() {
+    product() {
         var format = function(data) {
             data.title = data.title && data.title.length > 100 ? data.title.slice(0, 100) : data.title;
             data.desc = data.desc && data.desc.length > 300 ? data.desc.slice(0, 300) : data.desc;
@@ -699,7 +642,7 @@ class SDK extends EventEmitter {
             config = format(config);
             syncCustomProfile(config);
         }
-    })()
+    }
 
     /**
      * 打开客服聊天窗口
@@ -743,62 +686,12 @@ class SDK extends EventEmitter {
     }
 
     /**
-     * 程序开始入口
-     * @param {String} sdkURL           - SDK图片地址
-     */
-    init(sdkURL) {
-        var self = this;
-        var init = function() {
-            self.entry({
-                src: sdkURL
-            });
-
-            if (cache.getItemsInCache('winType') == 1) {
-                ysf.entryPanel(cache.getItemsInCache('corpInfo'));
-            }
-        };
-
-        /**
-         * 询问服务器配置信息
-         *
-         * @date: 2016-09-09  下午2:18
-         * @param {Number} dvcSwitch          - 会话在线开关 1: 开 0: 关
-         * @param {Number} pushSwitch         - 消息推送开关 1: 开 0: 关
-         * @param {Number} batchIdList        - 要申请的消息Id
-         */
-
-        setTimeout(function() {
-            util.ajax({
-                url: ysf.DOMAIN + 'webapi/user/dvcSession.action?k=' + cache['appKey'] + '&d=' + cache['device'] + '&f=' + cache['uid'],
-                success: function(json) {
-                    if (json.code == 200) {
-                        cache['dvcswitch'] = json.result.dvcSwitch; //|| json.result.dvcSwitch
-                        cache['pushswitch'] = json.result.pushSwitch || 0;
-                        cache['pushmsgid'] = json.result.batchIdList || 0;
-                        init();
-                    } else {
-                        cache['dvcswitch'] = 0;
-                        cache['pushswitch'] = 0;
-                        init();
-                    }
-                },
-                error: function() {
-                    cache['dvcswitch'] = 0;
-                    cache['pushswitch'] = 0;
-                    init();
-                }
-            });
-        }, 1000)
-
-    }
-
-    /**
      * 提供外部事件监听方式, 以保证资源加载成功
      *
      * @param {Object} event                - 事件集合
      * @param {String} event.onload         - iframe页面加载成功
      */
-    on(function() {
+    on() {
         var fmap = {
             onload: 'load',
             unread: 1
@@ -819,7 +712,7 @@ class SDK extends EventEmitter {
                 console.warn('波比(｡･∀･)ﾉ: 请保持正确的监听姿势...')
             }
         }
-    })()
+    }
 
     /**
      * 拉取推送消息列表
