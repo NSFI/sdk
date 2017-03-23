@@ -6,6 +6,8 @@
  */
 
 const EventEmitter = require('events').EventEmitter;
+const util = require('./util/util');
+const message = require('./util/message');
 
 class SDK extends EventEmitter {
     constructor(options) {
@@ -98,8 +100,8 @@ class SDK extends EventEmitter {
          *
          * @date: 2016-09-09  下午2:18
          * @param {Number} dvcSwitch          - 会话在线开关 1: 开 0: 关
-         * @param {Number} pushSwitch		  - 消息推送开关 1: 开 0: 关
-         * @param {Number} batchIdList		  - 要申请的消息Id
+         * @param {Number} pushSwitch         - 消息推送开关 1: 开 0: 关
+         * @param {Number} batchIdList        - 要申请的消息Id
          */
 
         setTimeout(function() {
@@ -131,7 +133,7 @@ class SDK extends EventEmitter {
     /**
      * 构建访客相关样式
      *
-     * @param  {String} css 				- 样式内容
+     * @param  {String} css                 - 样式内容
      * @return {Void}
      */
     style(content) {
@@ -152,8 +154,8 @@ class SDK extends EventEmitter {
     /**
      * 打开客服内嵌模式
      *
-     * @param {String | Node} parent 			- 父节点元素
-     * @param {Number} status					- 浮层模式标识
+     * @param {String | Node} parent            - 父节点元素
+     * @param {Number} status                   - 浮层模式标识
      */
     openInline(parent, status) {
         var url = this.url.apply(
@@ -190,8 +192,8 @@ class SDK extends EventEmitter {
 
     /**
      * 构建在线客服节点
-     * @param  {Object} options      			- 配置信息
-     * @param  {String} options.src  			- 图片地址
+     * @param  {Object} options                 - 配置信息
+     * @param  {String} options.src             - 图片地址
      */
     entry(options) {
         var self = this;
@@ -259,7 +261,7 @@ class SDK extends EventEmitter {
     /**
      * 构建在线客服控制台 Iframe容器
      *
-     * @param {Number} corpInfo				- 1 显示右侧栏导航, 2 隐藏右侧栏导航
+     * @param {Number} corpInfo             - 1 显示右侧栏导航, 2 隐藏右侧栏导航
      */
     entryPanel(corpInfo) {
         var div = document.createElement('div'),
@@ -285,11 +287,11 @@ class SDK extends EventEmitter {
      * 弹出邀请窗口
      *
      * @param  {Object} config - 配置信息
-     * @param  {String} config.src      		- 背景图片地址
-     * @param  {String} config.text     		- 提示文字
-     * @param  {String} config.reject   		- 关闭后对应操作方式
-     * @param  {Number} config.timeout  		- 邀请等待时间
-     * @param  {Number} config.interval 		- 关闭后再次打开时间
+     * @param  {String} config.src              - 背景图片地址
+     * @param  {String} config.text             - 提示文字
+     * @param  {String} config.reject           - 关闭后对应操作方式
+     * @param  {Number} config.timeout          - 邀请等待时间
+     * @param  {Number} config.interval         - 关闭后再次打开时间
      * @return {Void}
      */
     invite(function() {
@@ -396,8 +398,8 @@ class SDK extends EventEmitter {
     /**
      * 浮层样式打开
      *
-     * @param {String} url 			    	- 打开URL
-     * @param {Object} event 				- 新开窗口参数
+     * @param {String} url                  - 打开URL
+     * @param {Object} event                - 新开窗口参数
      */
     openLayer(url, event) {
         var layerNode = document.getElementById('YSF-PANEL-CORPINFO') || document.getElementById('YSF-PANEL-INFO'),
@@ -419,8 +421,8 @@ class SDK extends EventEmitter {
     /**
      * 新窗口打开
      *
-     * @param {String} url 			    	- 打开URL
-     * @param {Object} event 				- 新开窗口参数
+     * @param {String} url                  - 打开URL
+     * @param {Object} event                - 新开窗口参数
      */
     openWin(url, event) {
         window.open(url, 'YSF_SERVICE_' + (cache.getItemsInCache('appKey') || '').toUpperCase(), event.param);
@@ -428,8 +430,8 @@ class SDK extends EventEmitter {
 
     /**
      * 新标签打开
-     * @param {String} url 			    	- 打开URL
-     * @param {Object} event 				- 新开窗口参数
+     * @param {String} url                  - 打开URL
+     * @param {Object} event                - 新开窗口参数
      */
     openUrl(url, event) {
         window.open(url, 'YSF_SERVICE_' + (cache.getItemsInCache('appKey') || '').toUpperCase(), event.param);
@@ -438,8 +440,8 @@ class SDK extends EventEmitter {
     /**
      * 消息提醒和气泡管理
      *
-     * @param {Object} event 				- 事件对象
-     * @param {String} event.type       	- 清除消息圈 : clearCircle;
+     * @param {Object} event                - 事件对象
+     * @param {String} event.type           - 清除消息圈 : clearCircle;
      * @constructor
      */
     NotifyMsgAndBubble(event) {
@@ -497,9 +499,9 @@ class SDK extends EventEmitter {
     /**
      * 获取当前未读消息数接口
      *
-     * @return {Object} data				- 返回对象
-     * 		   {String} message				- 消息
-     * 		   {Number} total				- 消息数
+     * @return {Object} data                - 返回对象
+     *         {String} message             - 消息
+     *         {Number} total               - 消息数
      */
     getUnreadMsg() {
         return {
@@ -523,6 +525,62 @@ class SDK extends EventEmitter {
      * @param  {String} options.data    - 企业当前登录用户其他信息，JSON字符串
      */
     config(options) {
+        /**
+         * 初始化窗口配置
+         *
+         * @param {Number} winType          - 1: 浮层layer 2: 弹窗 3: url
+         */
+        var initWinConfig = function() {
+            var screen = window.screen || {};
+            var winParamUtil = {
+                base: ',location=0,menubar=0,scrollbars=0,status=0,toolbar=0,resizable=0',
+                winNoInfo: {
+                    width: 600,
+                    height: 630,
+                    top: Math.max(0, ((screen.height || 0) - 630) / 2),
+                    left: Math.max(0, ((screen.width || 0) - 600) / 2),
+                },
+                winHasInfo: {
+                    width: 842,
+                    height: 632,
+                    top: Math.max(0, ((screen.height || 0) - 630) / 2),
+                    left: Math.max(0, ((screen.width || 0) - 840) / 2),
+                },
+                layerNoInfo: {
+                    param: ''
+                },
+                layerHasInfo: {
+                    param: ''
+                }
+            };
+
+            winParamUtil.winNoInfo.param = 'top=' + winParamUtil.winNoInfo.top + ',left=' + winParamUtil.winNoInfo.left + ',width=' + winParamUtil.winNoInfo.width + ',height=' + winParamUtil.winNoInfo.height + winParamUtil.base;
+            winParamUtil.winHasInfo.param = 'top=' + winParamUtil.winHasInfo.top + ',left=' + winParamUtil.winHasInfo.left + ',width=' + winParamUtil.winHasInfo.width + ',height=' + winParamUtil.winHasInfo.height + winParamUtil.base;
+
+            // 移动端平台使用url方式
+            if (util.isMobilePlatform()) {
+                cache.setItemsInCache({ 'winType': 3 });
+            }
+
+            // winType 1: 浮层layer 2: 弹窗 3: url
+            var type = cache.getItemsInCache('winType');
+            var winParam = this.winParam;
+            switch (type) {
+                case 1:
+                    winParam = cache.getItemsInCache('corpInfo') ? winParamUtil.layerHasInfo : winParamUtil.layerNoInfo;
+                    winParam.type = 'layer';
+                    break;
+                case 3:
+                    winParam = { type: 'url', param: '' }
+                    break;
+                default:
+                    winParam = cache.getItemsInCache('corpInfo') ? winParamUtil.winHasInfo : winParamUtil.winNoInfo;
+                    winParam.type = 'win';
+                    break;
+            }
+
+        };
+
         if (!options) {
             return;
         }
@@ -538,7 +596,7 @@ class SDK extends EventEmitter {
             message.syncProfile();
 
             // init window type config
-            util.initWinConfig();
+            initWinConfig();
 
             // MSG Numbers Init
 
@@ -548,12 +606,12 @@ class SDK extends EventEmitter {
 
     /**
      * 打开客服聊天窗口
-     * @param  {Object} options        		- 配置信息
-     * @param  {String} options.appKey 		- 当前企业申请到的云信KEY，必须传此参数
-     * @param  {String} options.uid    		- 企业当前登录用户标识，不传表示匿名用户
-     * @param  {String} options.name  		- 用户姓名
-     * @param  {String} options.email  		- 邮箱地址
-     * @return {String}                  	聊天地址
+     * @param  {Object} options             - 配置信息
+     * @param  {String} options.appKey      - 当前企业申请到的云信KEY，必须传此参数
+     * @param  {String} options.uid         - 企业当前登录用户标识，不传表示匿名用户
+     * @param  {String} options.name        - 用户姓名
+     * @param  {String} options.email       - 邮箱地址
+     * @return {String}                     聊天地址
      */
     url() {
         if (!cache.getItemsInCache('appKey')) {
@@ -619,13 +677,13 @@ class SDK extends EventEmitter {
 
     /**
      * 自定义商品信息
-     * @param  {Object} config 				- 配置信息
-     * @param  {String} config.title      	- 图文混排消息的大标题
-     * @param  {String} config.desc     	- 消息描述
-     * @param  {String} config.picture   	- 展示在左边的图片url链接
-     * @param  {String} config.url  		- 点击图文消息的跳转链接地址
-     * @param  {String} config.note 		- 备注
-     * @param  {Number} config.hide 		- 是否要在用户端隐藏，0为显示，1为隐藏，默认为显示。
+     * @param  {Object} config              - 配置信息
+     * @param  {String} config.title        - 图文混排消息的大标题
+     * @param  {String} config.desc         - 消息描述
+     * @param  {String} config.picture      - 展示在左边的图片url链接
+     * @param  {String} config.url          - 点击图文消息的跳转链接地址
+     * @param  {String} config.note         - 备注
+     * @param  {Number} config.hide         - 是否要在用户端隐藏，0为显示，1为隐藏，默认为显示。
      * @return {Void}
      */
     product(function() {
@@ -660,10 +718,10 @@ class SDK extends EventEmitter {
         var winParam = this.winParam;
         switch (type) {
             case 'win':
-                ysf.openWin(url, winParam);
+                this.openWin(url, winParam);
                 break;
             case 'layer':
-                ysf.openLayer(url, winParam);
+                this.openLayer(url, winParam);
                 try {
                     if (this.firstBtnClick && cache.getItemsInCache('dvcswitch') == 0 && cache.getItemsInCache('pushswitch') == 0) {
                         message.sendChatMsg('doconnect', { doconnect: 1 });
@@ -686,7 +744,7 @@ class SDK extends EventEmitter {
 
     /**
      * 程序开始入口
-     * @param {String} sdkURL			- SDK图片地址
+     * @param {String} sdkURL           - SDK图片地址
      */
     init(sdkURL) {
         var self = this;
@@ -705,8 +763,8 @@ class SDK extends EventEmitter {
          *
          * @date: 2016-09-09  下午2:18
          * @param {Number} dvcSwitch          - 会话在线开关 1: 开 0: 关
-         * @param {Number} pushSwitch		  - 消息推送开关 1: 开 0: 关
-         * @param {Number} batchIdList		  - 要申请的消息Id
+         * @param {Number} pushSwitch         - 消息推送开关 1: 开 0: 关
+         * @param {Number} batchIdList        - 要申请的消息Id
          */
 
         setTimeout(function() {
@@ -737,8 +795,8 @@ class SDK extends EventEmitter {
     /**
      * 提供外部事件监听方式, 以保证资源加载成功
      *
-     * @param {Object} event				- 事件集合
-     * @param {String} event.onload			- iframe页面加载成功
+     * @param {Object} event                - 事件集合
+     * @param {String} event.onload         - iframe页面加载成功
      */
     on(function() {
         var fmap = {
@@ -766,7 +824,7 @@ class SDK extends EventEmitter {
     /**
      * 拉取推送消息列表
      *
-     * @param {Array} ids				- 消息列表
+     * @param {Array} ids               - 消息列表
      */
     getPushMessage(ids) {
         sendChatMsg('dogetpushmsg', {
@@ -776,9 +834,9 @@ class SDK extends EventEmitter {
 
     /**
      * 获取当前未读消息数接口
-     * @return {Object} data			- 返回对象
-     * 		   {String} message			- 消息
-     * 		   {Number} total			- 消息数
+     * @return {Object} data            - 返回对象
+     *         {String} message         - 消息
+     *         {Number} total           - 消息数
      */
     unread() {
         return {
