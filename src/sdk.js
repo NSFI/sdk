@@ -10,6 +10,7 @@ const util = require('./util/util');
 const message = require('./util/message');
 const ajax = require('./util/ajax');
 const dom = require('./util/dom');
+const Cache = require('./cache');
 
 class SDK extends EventEmitter {
     constructor(options) {
@@ -24,6 +25,7 @@ class SDK extends EventEmitter {
         this.CircleNumberFlag = 0;
         this.msgSessionIds = [];
 
+        var cache = new Cache({appkey: options.appkey});
         this.build();
         this.init(options);
     }

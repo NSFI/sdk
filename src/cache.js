@@ -110,7 +110,7 @@ class Cache extends EventEmitter {
 
 }
 
-module.exports = new Cache({'appkey': '85d4ae43dfc35259c4a29abc9aea8f55'});
+module.exports =Cache;
 
 
 

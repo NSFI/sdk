@@ -1644,6 +1644,7 @@ var SFSDK =
 	var message = __webpack_require__(95);
 	var ajax = __webpack_require__(97);
 	var dom = __webpack_require__(96);
+	var Cache = __webpack_require__(92);
 
 	var SDK = function (_EventEmitter) {
 	    (0, _inherits3['default'])(SDK, _EventEmitter);
@@ -1663,6 +1664,7 @@ var SFSDK =
 	        _this.CircleNumberFlag = 0;
 	        _this.msgSessionIds = [];
 
+	        var cache = new Cache({ appkey: options.appkey });
 	        _this.build();
 	        _this.init(options);
 	        return _this;
@@ -3392,7 +3394,7 @@ var SFSDK =
 		return Cache;
 	}(EventEmitter);
 
-	module.exports = new Cache({ 'appkey': '85d4ae43dfc35259c4a29abc9aea8f55' });
+	module.exports = Cache;
 
 /***/ },
 /* 93 */
