@@ -240,6 +240,7 @@ class SDK extends EventEmitter {
      * @return {Void}
      */
     invite() {
+        var self = this;
         var nWrap, nBody, nText, xConf,
             doc = document.createDocumentFragment();
         var buildInvite = function() {
@@ -278,7 +279,7 @@ class SDK extends EventEmitter {
             nBody.style.visibility = 'visible';
         };
         var openChat = function() {
-            ysf.open();
+            self.open();
             hideInvite();
         };
         var closeInvite = function(event) {

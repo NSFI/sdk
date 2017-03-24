@@ -1896,6 +1896,7 @@ var SFSDK =
 	    }, {
 	        key: 'invite',
 	        value: function invite() {
+	            var self = this;
 	            var nWrap,
 	                nBody,
 	                nText,
@@ -1937,7 +1938,7 @@ var SFSDK =
 	                nBody.style.visibility = 'visible';
 	            };
 	            var openChat = function openChat() {
-	                ysf.open();
+	                self.open();
 	                hideInvite();
 	            };
 	            var closeInvite = function closeInvite(event) {
